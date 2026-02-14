@@ -1,13 +1,8 @@
-<<<<<<< HEAD
+Done
+    - backend for login and register (0f006ee3e7cfad40bf64991806f2db8f3aeac286)
+    - web (0f006ee3e7cfad40bf64991806f2db8f3aeac286)
 
-Backend
+In-progress
+    - mobile
 
-Register (IN-PROGRESS)
-Login (IN-PROGRESS)
-api/user/me (IN-PROGRESS)
-=======
-Backend 
-- Register (IN-PROGRESS)
-- Login (IN-PROGRESS)
-- api/user/me (IN-PROGRESS)
->>>>>>> c6ac002823ea6b609e963bc0f6baa6cbc480ce70
+To Do
