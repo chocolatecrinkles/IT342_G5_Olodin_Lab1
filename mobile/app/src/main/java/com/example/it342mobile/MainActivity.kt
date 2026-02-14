@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
             IT342MobileTheme {
                 LoginScreen(
                     onLoginSuccess = {
-                        // TODO: Navigate to Dashboard screen
+
                     }
                 )
             }
