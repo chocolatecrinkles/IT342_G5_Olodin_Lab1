@@ -11,8 +11,6 @@ import com.example.demo.dto.LoginDTO;
 import com.example.demo.dto.RegisterDTO;
 import com.example.demo.service.AuthService;
 import com.example.demo.model.User;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -28,6 +26,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterDTO dto) {
+        System.out.println(">>> REGISTER CALLED for " + dto.getEmail());
         try{
             User user = authService.register(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body("User successfully created");
