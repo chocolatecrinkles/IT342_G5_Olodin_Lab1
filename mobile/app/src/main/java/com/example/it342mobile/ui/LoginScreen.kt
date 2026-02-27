@@ -1,7 +1,6 @@
 package com.example.it342mobile.ui
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,6 +14,7 @@ import com.example.it342mobile.data.api.ApiClient
 import com.example.it342mobile.data.api.AuthApi
 import com.example.it342mobile.data.model.LoginRequest
 import com.example.it342mobile.data.response.JwtResponse
+import com.example.it342mobile.ui.components.AppDialog
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,10 +30,14 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
+    var showErrorDialog by remember{ mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(24.dp)
+            .imePadding(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -82,7 +86,9 @@ fun LoginScreen(
                                 onLoginSuccess()
                             }
                         } else {
-                            Toast.makeText(context, "Login failed (${response.code()})", Toast.LENGTH_LONG).show()
+//                            Toast.makeText(context, "Login failed (${response.code()})", Toast.LENGTH_LONG).show()
+                            errorMessage = "Login failed (${response.code()})"
+                            showErrorDialog = true
                         }
                     }
 
@@ -92,11 +98,13 @@ fun LoginScreen(
                     ) {
                         isLoading = false
                         Log.e("LOGIN", "Network error", t)
-                        Toast.makeText(
-                            context,
-                            "Network error: ${t.localizedMessage}",
-                            Toast.LENGTH_LONG
-                        ).show()
+//                        Toast.makeText(
+//                            context,
+//                            "Network error: ${t.localizedMessage}",
+//                            Toast.LENGTH_LONG
+//                        ).show()
+                        errorMessage = "Network error: ${t.localizedMessage}"
+                        showErrorDialog = true
                     }
                 })
             },
@@ -110,6 +118,10 @@ fun LoginScreen(
 
         TextButton(onClick = onGoToRegister){
             Text("Don't have an account? Register")
+        }
+
+        if(showErrorDialog) {
+            AppDialog(title = "Login Failed", message = errorMessage, confirmText = "OK", onConfirm = { showErrorDialog = false }, onDismiss = { showErrorDialog = false} )
         }
     }
 }

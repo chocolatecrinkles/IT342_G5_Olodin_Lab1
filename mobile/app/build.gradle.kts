@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.7")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
