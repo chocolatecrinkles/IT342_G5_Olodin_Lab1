@@ -16,11 +16,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             IT342MobileTheme {
-<<<<<<< Updated upstream
-                LoginScreen(
-                    onLoginSuccess = {
-                        // TODO: Navigate to Dashboard screen
-=======
 
                 var currentScreen by remember { mutableStateOf("LOGIN") }
 
@@ -37,7 +32,6 @@ class MainActivity : ComponentActivity() {
                         "DASHBOARD" -> DashboardScreen (
                             onLogout = { currentScreen = "LOGIN"}
                         )
->>>>>>> Stashed changes
                     }
                 }
             }
