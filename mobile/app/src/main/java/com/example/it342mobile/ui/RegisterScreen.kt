@@ -1,13 +1,7 @@
 package com.example.it342mobile.ui
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -18,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -30,6 +25,7 @@ import com.example.it342mobile.data.api.ApiClient
 import com.example.it342mobile.data.api.AuthApi
 import com.example.it342mobile.data.model.RegisterRequest
 import com.example.it342mobile.data.response.MessageResponse
+import com.example.it342mobile.ui.components.AppDialog
 
 @Composable
 fun RegisterScreen(
@@ -44,24 +40,32 @@ fun RegisterScreen(
     var lastname by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogTitle by remember { mutableStateOf("") }
+    var dialogMessage by remember { mutableStateOf("") }
+    var isSuccess by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center
+            .padding(24.dp)
+            .imePadding(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Register", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(Modifier.height(16.dp))
 
-        OutlinedTextField(value = firstname, onValueChange = { firstname = it }, label = { Text("First name") })
-        OutlinedTextField(value = lastname, onValueChange = { lastname = it }, label = { Text("Last name") })
-        OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
+        OutlinedTextField(value = firstname, onValueChange = { firstname = it }, label = { Text("First name") }, modifier = Modifier.fillMaxWidth() )
+        OutlinedTextField(value = lastname, onValueChange = { lastname = it }, label = { Text("Last name") }, modifier = Modifier.fillMaxWidth() )
+        OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") }, modifier = Modifier.fillMaxWidth() )
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(Modifier.height(16.dp))
@@ -79,10 +83,15 @@ fun RegisterScreen(
                         ) {
                             isLoading = false
                             if (response.isSuccessful) {
-                                Toast.makeText(context, "Registered successfully", Toast.LENGTH_SHORT).show()
-                                onRegisterSuccess()
+                                dialogTitle = "Registration Successful"
+                                dialogMessage = "Your account has been successfully created."
+                                isSuccess = true
+                                showDialog = true
                             } else {
-                                Toast.makeText(context, "Register failed", Toast.LENGTH_SHORT).show()
+                                dialogTitle = "Registration Failed"
+                                dialogMessage = "Please try again."
+                                isSuccess = false
+                                showDialog = true
                             }
                         }
 
@@ -100,6 +109,18 @@ fun RegisterScreen(
 
         TextButton(onClick = onGoToLogin) {
             Text("Already have an account? Login")
+        }
+
+        if(showDialog){
+            AppDialog(
+                title = dialogTitle,
+                message = dialogMessage,
+                confirmText = if(isSuccess) "Go to Login page" else "Close",
+                onConfirm = { showDialog = false
+                    if (isSuccess) onRegisterSuccess()
+                },
+                onDismiss = { showDialog = false}
+            )
         }
     }
 

@@ -1,89 +1,89 @@
 package com.example.it342mobile.ui
 
-import android.widget.Toast
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 // your app imports
 import com.example.it342mobile.data.api.ApiClient
 import com.example.it342mobile.data.TokenManager
 import com.example.it342mobile.data.api.UserApi
 import com.example.it342mobile.data.model.UserProfile
+import com.example.it342mobile.ui.components.AppDialog
+
 @Composable
-fun DashboardScreen(onLogout: () -> Unit) {
-    val context = LocalContext.current
-    val tokenManager = remember { TokenManager(context) }
+fun DashboardScreen(
+    profile: UserProfile,
+    onLogout: () -> Unit
+) {
+    val initials =
+        (profile.firstname.firstOrNull()?.uppercaseChar() ?: '?').toString() +
+                (profile.lastname.firstOrNull()?.uppercaseChar() ?: '?').toString()
 
-    var profile by remember { mutableStateOf<UserProfile?>(null) }
-
-    LaunchedEffect(Unit) {
-        val token = tokenManager.getToken()
-        if (token == null) {
-            onLogout()
-            return@LaunchedEffect
-        }
-
-        val api = ApiClient.retrofit.create(UserApi::class.java)
-        api.getMe("Bearer $token").enqueue(object : Callback<UserProfile> {
-            override fun onResponse(
-                call: Call<UserProfile>,
-                response: Response<UserProfile>
-            ) {
-                if (response.isSuccessful) {
-                    profile = response.body()
-                } else {
-                    tokenManager.clearToken()
-                    onLogout()
-                }
-            }
-
-            override fun onFailure(call: Call<UserProfile>, t: Throwable) {
-                Toast.makeText(context, "Network error", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    profile?.let {
-        Column(
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.secondary),
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp)
+                .padding(16.dp)
+                .widthIn(max = 360.dp),
+            shape = RoundedCornerShape(12.dp),
+            tonalElevation = 4.dp,
+            shadowElevation = 8.dp
         ) {
-            Text("Dashboard", style = MaterialTheme.typography.headlineMedium)
-            Spacer(Modifier.height(16.dp))
-
-            Text("Email: ${it.email}")
-            Text("Name: ${it.firstname} ${it.lastname}")
-
-            Spacer(Modifier.height(24.dp))
-
-            Button(
-                onClick = {
-                    tokenManager.clearToken()
-                    onLogout()
-                },
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier.padding(30.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Logout")
+
+                Box(
+                    modifier = Modifier
+                        .size(90.dp)
+                        .background(
+                            MaterialTheme.colorScheme.primary,
+                            CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = initials,
+                        color = Color.White,
+                        style = MaterialTheme.typography.headlineLarge
+                    )
+                }
+
+                Spacer(Modifier.height(12.dp))
+
+                Text(
+                    text = "${profile.firstname} ${profile.lastname}",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+
+                Text(profile.email)
+
+                Spacer(Modifier.height(20.dp))
+
+                Button(
+                    onClick = onLogout,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("Logout")
+                }
             }
         }
     }
