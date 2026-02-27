@@ -17,18 +17,16 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
-        System.out.println(">>> /api/user/me HIT <<<");
-        System.out.println("Auth object = " + authentication);
         String email = authentication.getName();
 
         User user = authService.getCurrentUser(email);
 
         return ResponseEntity.ok(new UserResponse(
-                user.getUserId(),
-                user.getEmail(),
-                user.getFirstname(),
-                user.getLastname(),
-                user.getCreatedAt()
+            user.getUserId(),
+            user.getEmail(),
+            user.getFirstname(),
+            user.getLastname(),
+            user.getCreatedAt()
         ));
     }
 

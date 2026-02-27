@@ -1,5 +1,6 @@
 package com.example.it342mobile.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -9,15 +10,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.it342mobile.data.TokenManager
 import com.example.it342mobile.data.api.ApiClient
 import com.example.it342mobile.data.api.AuthApi
 import com.example.it342mobile.data.model.LoginRequest
+import com.example.it342mobile.data.response.JwtResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
+fun LoginScreen(
+    onLoginSuccess: () -> Unit,
+    onGoToRegister: () -> Unit
+    ) {
     val context = LocalContext.current
 
     var email by remember { mutableStateOf("") }
@@ -61,24 +67,36 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 
                 val api = ApiClient.retrofit.create(AuthApi::class.java)
                 val request = LoginRequest(email, password)
+                val tokenManager = TokenManager(context)
 
-                api.login(request).enqueue(object : Callback<com.example.it342mobile.data.response.MessageResponse> {
+                api.login(request).enqueue(object : Callback<JwtResponse> {
                     override fun onResponse(
-                        call: Call<com.example.it342mobile.data.response.MessageResponse>,
-                        response: Response<com.example.it342mobile.data.response.MessageResponse>
+                        call: Call<JwtResponse>,
+                        response: Response<JwtResponse>
                     ) {
                         isLoading = false
                         if (response.isSuccessful) {
-                            Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
-                            onLoginSuccess()
+                            val token = response.body()?.token
+                            if (token != null) {
+                                tokenManager.saveToken(token)
+                                onLoginSuccess()
+                            }
                         } else {
-                            Toast.makeText(context, "Invalid email or password", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Login failed (${response.code()})", Toast.LENGTH_LONG).show()
                         }
                     }
 
-                    override fun onFailure(call: Call<com.example.it342mobile.data.response.MessageResponse>, t: Throwable) {
+                    override fun onFailure(
+                        call: Call<JwtResponse>,
+                        t: Throwable
+                    ) {
                         isLoading = false
-                        Toast.makeText(context, "Network error", Toast.LENGTH_SHORT).show()
+                        Log.e("LOGIN", "Network error", t)
+                        Toast.makeText(
+                            context,
+                            "Network error: ${t.localizedMessage}",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 })
             },
@@ -86,6 +104,12 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
             enabled = !isLoading
         ) {
             Text(if (isLoading) "Logging in..." else "Login")
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        TextButton(onClick = onGoToRegister){
+            Text("Don't have an account? Register")
         }
     }
 }

@@ -20,10 +20,13 @@ export const login = async (data) => {
 
     if (!res.ok) throw new Error(await res.text());
 
+    const result = await res.json();
+
     localStorage.setItem("loggedIn", "true");
     localStorage.setItem("email", data.email);
+    localStorage.setItem("token", result.token);
 
-    return res.text()
+    return result.token;
 };
 
 export const logout = () => {
